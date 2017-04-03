@@ -1,18 +1,43 @@
 {
-  "name": "01-fp",
+  "name": "02-chess",
   "version": "1.0.0",
-  "description": "Assignment",
+  "description": "Second Assignment",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --compilers js:babel-register"
+    "build": "grunt",
+    "start": "grunt start",
+    "test": "ava"
   },
   "author": "Hannes Moser <hannes@impossiblearts.com>",
   "license": "MIT",
+  "ava": {
+    "require": [
+      "babel-register",
+      "babel-polyfill"
+    ],
+    "babel": "inherit"
+  },
   "devDependencies": {
-    "babel-cli": "^6.24.0",
-    "babel-preset-env": "^1.2.2",
-    "babel-register": "^6.24.0",
-    "mocha": "^3.2.0",
-    "should": "^11.2.1"
+    "babel-cli": "^6.18.0",
+    "babel-preset-es2015": "^6.18.0",
+    "babelify": "^7.3.0",
+    "bootstrap": "^3.3.7",
+    "chess.js": "^0.10.2",
+    "chessboardjs": "0.0.1",
+    "grunt": "^0.4.5",
+    "grunt-browserify": "^4.0.1",
+    "grunt-cli": "^1.2.0",
+    "grunt-contrib-clean": "^1.0.0",
+    "grunt-contrib-connect": "^1.0.2",
+    "grunt-contrib-copy": "^1.0.0",
+    "grunt-contrib-watch": "^0.6.1",
+    "handlebars": "^4.0.3",
+    "hbsfy": "^2.7.0",
+    "jquery": "^3.1.1",
+    "load-grunt-tasks": "^3.3.0",
+    "serve-static": "^1.11.1",
+    "socket.io-client": "^1.5.1",
+    "time-grunt": "^1.2.1",
+    "uglifyify": "^3.0.4"
   }
 }
