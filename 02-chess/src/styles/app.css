@@ -1,0 +1,41 @@
+#board-area {
+  width: 1000px;
+  height: 600px;
+  margin: auto;
+}
+
+#board {
+  float: left;
+  margin: 0 !important;
+}
+
+#status-bar {
+  width: 400px;
+  height: 596px;
+  background: #ccc;
+  float: left;
+  margin-left: -6px;
+  padding-left: 10px;
+  border: 2px solid #404040;
+  box-sizing: border-box;
+}
+
+#status-bar p {
+  font-weight: bold;
+  font-size: 120%;
+}
+
+#status-bar p span {
+  font-weight: normal;
+  font-size: 90%;
+}
+
+#status-bar .pgn {
+  height: 444px;
+  overflow-y: scroll;
+}
+
+#status-bar .status {
+  height: 148px;
+  overflow-y: hidden;
+}

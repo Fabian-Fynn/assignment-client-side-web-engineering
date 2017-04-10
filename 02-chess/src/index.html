@@ -1,9 +1,23 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <link rel="stylesheet" href="styles/chessboard.css">
+    <link rel="stylesheet" href="styles/app.css">
   </head>
   <body>
-    <h1>04-chess</h4>
+    <h1>04-chess</h1>
+    <div id="board-area">
+      <div id="board" style="width: 600px"></div>
+      <div id="status-bar">
+        <div class="status">
+          <p>Status: <br /><span id="status"></span></p>
+          <p>FEN: <br /><span id="fen"></span></p>
+        </div>
+        <div class="pgn">
+          <p>PGN: <br /><span id="pgn"></span></p>
+        </div>
+      </div>
+    </div>
+    <script src="app.js"></script>
   </body>
 </html>
-
