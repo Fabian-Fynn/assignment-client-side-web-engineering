@@ -1,4 +1,4 @@
-# 04-chess
+# 02-chess
 
 > When you see a good move, look for a better one
 
