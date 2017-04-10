@@ -39,3 +39,11 @@
   height: 148px;
   overflow-y: hidden;
 }
+
+#controls button, #controls input{
+  margin-bottom: 10px;
+}
+
+#restart-game {
+  display: none;
+}

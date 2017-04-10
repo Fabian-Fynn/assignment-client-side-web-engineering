@@ -1,19 +1,26 @@
 import $ from 'jquery';
+import io from 'socket.io-client';
 import config from './config';
-import ChessBoard from 'chessboardjs';
 import Chess from 'chess.js';
+import ChessBoard from 'chessboardjs';
+
 window.$ = $;
 
-let board,
+let board = ChessBoard('board'),
   game = Chess.Chess(),
   statusEl = $('#status'),
   fenEl = $('#fen'),
-  pgnEl = $('#pgn');
+  pgnEl = $('#pgn'),
+  ownColor = undefined;
+
 window.game = game;
+window.board = board;
+
 const onDragStart = function(source, piece, position, orientation) {
   if (game.game_over() === true ||
       (game.turn() === 'w' && piece.search(/^b/) !== -1) ||
-      (game.turn() === 'b' && piece.search(/^w/) !== -1)) {
+      (game.turn() === 'b' && piece.search(/^w/) !== -1) ||
+      (game.turn() !== game.player)){
     return false;
   }
 };
@@ -29,6 +36,7 @@ const onDrop = function(source, target) {
   // illegal move
   if (move === null) return 'snapback';
 
+  socket.emit('move', {move: move.san});
   updateStatus();
 };
 
@@ -71,15 +79,79 @@ const updateStatus = function() {
   pgnEl.html(game.pgn({ max_width: 5, newline_char: '<br />' }));
 };
 
-const cfg = {
-  draggable: true,
-  pieceTheme: 'images/chesspieces/wikipedia/{piece}.png',
-  position: 'start',
-  onDragStart: onDragStart,
-  onDrop: onDrop,
-  onSnapEnd: onSnapEnd
-};
+const startGame = function(options) {
+  const cfg = {
+    draggable: true,
+    orientation: options.orientation,
+    pieceTheme: 'images/chesspieces/wikipedia/{piece}.png',
+    position: 'start',
+    onDragStart: onDragStart,
+    onDrop: onDrop,
+    onSnapEnd: onSnapEnd
+  };
 
-board = ChessBoard('board', cfg);
-$(window).resize(board.resize);
-updateStatus();
+  board = ChessBoard('board', cfg);
+  board.orientation(options.orientation);
+  game.player = options.orientation.charAt(0);
+  $(window).resize(board.resize);
+  updateStatus();
+}
+
+// Socket stuff
+const socket = io(config.SERVER_URL);
+
+socket.on('game created', function(data) {
+  if (data.game.id) {
+    $('#game-id').html(' ' + data.game.id);
+  }
+});
+
+socket.on('game joined', function(data) {
+  ownColor = data.player.color;
+  $('#game-id').html(' ' + data.game.id);
+});
+
+socket.on('game started', function() {
+  startGame({
+    position: 'start',
+    orientation: ownColor
+  })
+  $('#restart-game').show();
+});
+
+socket.on('move', function(data) {
+  const move = game.move(data.move);
+  board.move(`${move.from}-${move.to}`);
+  updateStatus();
+});
+
+socket.on('restart', function() {
+  startGame({
+    position: 'start',
+    orientation: ownColor
+  });
+})
+
+// Button stuff
+$('#host-game').click(function() {
+  socket.emit('new game');
+  $('#status').html('Waiting for other player');
+});
+
+$('#join-game').click(function() {
+  const gameName = $('#join-input').val();
+  if (gameName !== '') {
+    $('#status').html('Joining');
+    socket.emit('join game', {game: gameName});
+  }
+});
+
+$('#restart-game').click(function() {
+  socket.emit('restart');
+  startGame({
+    position: 'start',
+    orientation: ownColor
+  });
+});
+
+$('#status').html('Host or join game');

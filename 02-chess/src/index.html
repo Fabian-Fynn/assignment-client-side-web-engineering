@@ -5,7 +5,15 @@
     <link rel="stylesheet" href="styles/app.css">
   </head>
   <body>
-    <h1>04-chess</h1>
+    <h1>Chess Client</h1>
+    <div id="controls">
+      <p>Game ID:<span id="game-id"></span></p>
+      <button type="button" name="button" id="host-game">Host Game</button> <br />
+      <input type="text" name="game-name" placeholder="name of game" id="join-input">
+      <button type="button" name="button" id="join-game">Join Game</button>
+      <br />
+      <button type="button" name="button" id="restart-game">Restart Game</button>
+    </div>
     <div id="board-area">
       <div id="board" style="width: 600px"></div>
       <div id="status-bar">
