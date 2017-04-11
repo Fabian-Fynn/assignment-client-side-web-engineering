@@ -7,14 +7,11 @@ import ChessBoard from 'chessboardjs';
 window.$ = $;
 
 let board = ChessBoard('board'),
-  game = Chess.Chess(),
+  game = undefined,
   statusEl = $('#status'),
   fenEl = $('#fen'),
   pgnEl = $('#pgn'),
   ownColor = undefined;
-
-window.game = game;
-window.board = board;
 
 const onDragStart = function(source, piece, position, orientation) {
   if (game.game_over() === true ||
@@ -92,6 +89,7 @@ const startGame = function(options) {
 
   board = ChessBoard('board', cfg);
   board.orientation(options.orientation);
+  game = Chess.Chess()
   game.player = options.orientation.charAt(0);
   $(window).resize(board.resize);
   updateStatus();
