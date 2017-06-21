@@ -1,7 +1,16 @@
 import PouchDB from 'pouchdb'
 
 const localDB = new PouchDB('mmt-ss2017')
-const remoteDB = new PouchDB('https://couchdb.5k20.com/mmt-ss2017')
+const remoteDB = new PouchDB('https://couchdb.5k20.com/mmt-ss2017', {
+    auth: {
+        username: 'fhoffmann',
+        password: 'test',
+    }
+})
+
+localDB.sync(remoteDB, {
+    live: true,
+})
 
 export default class Store {
     /**
@@ -12,7 +21,6 @@ export default class Store {
         /**
          * @type {ItemList}
          */
-        let liveTodos
 
         /**
          * Read the local ItemList from localStorage.
@@ -20,6 +28,25 @@ export default class Store {
          * @returns {ItemList} Current array of todos
          */
         this.getStore = () => {
+            return new Promise((resolve, reject) => {
+                localDB.allDocs({
+                    include_docs: true,
+                }).then((docs) => {
+                    const todos = docs.rows.map((row) => {
+                        return {
+                            id: row.doc._id,
+                            completed: row.doc.completed,
+                            title: row.doc.title,
+                            _rev: row.doc._rev,
+                        }
+                    })
+                    resolve(todos);
+                })
+            })
+        }
+
+        if (callback) {
+            callback();
         }
 
         /**
@@ -47,7 +74,22 @@ export default class Store {
 	 * })
      */
     find(query, callback) {
+        this.getStore()
+            .then((todos) => {
+                let k;
 
+                const result = todos.filter(todo => {
+                    for (k in query) {
+                        if (query[k] !== todo[k]) {
+                            return false;
+                        }
+                    }
+                    return true;
+                })
+                console.log('result :', result);
+
+                callback(result);
+            })
     }
 
     /**
@@ -57,6 +99,14 @@ export default class Store {
      * @param {function()} [callback] Called when partialRecord is applied
      */
     update(update, callback) {
+        this.getStore().then((todos) => {
+            todos.put({
+                _id: update._id.toString(),
+                _rev: update._rev,
+                title: update.title,
+                completed: update.completed,
+            })
+        })
 
     }
 
@@ -67,7 +117,10 @@ export default class Store {
      * @param {function()} [callback] Called when item is inserted
      */
     insert(item, callback) {
+        item._id = item.id.toString();
 
+        localDB.put(item)
+            .then(() => callback())
     }
 
     /**

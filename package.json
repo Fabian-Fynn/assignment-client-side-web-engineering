@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "todomvc-common": "^1.0.3"
+  }
+}

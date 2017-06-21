@@ -20,7 +20,7 @@ export default class View {
         this.$main = qs('.main')
         this.$toggleAll = qs('.toggle-all')
         this.$newTodo = qs('.new-todo')
-        $delegate(this.$todoList, 'li label', 'dblclick', ({target}) => {
+        $delegate(this.$todoList, 'li label', 'dblclick', ({ target }) => {
             this.editItem(target)
         })
     }
@@ -117,6 +117,7 @@ export default class View {
 	 */
     clearNewTodo() {
         this.$newTodo.value = ''
+
     }
 
 	/**
@@ -134,7 +135,7 @@ export default class View {
 
         listItem.className = completed ? 'completed' : ''
 
-		// In case it was toggled from an event and not by clicking the checkbox
+        // In case it was toggled from an event and not by clicking the checkbox
         qs('input', listItem).checked = completed
     }
 
@@ -159,7 +160,7 @@ export default class View {
 	 * @param {Function} handler Function called on synthetic event.
 	 */
     bindAddItem(handler) {
-        $on(this.$newTodo, 'change', ({target}) => {
+        $on(this.$newTodo, 'change', ({ target }) => {
             const title = target.value.trim()
             if (title) {
                 handler(title)
@@ -178,7 +179,7 @@ export default class View {
 	 * @param {Function} handler Function called on synthetic event.
 	 */
     bindToggleAll(handler) {
-        $on(this.$toggleAll, 'click', ({target}) => {
+        $on(this.$toggleAll, 'click', ({ target }) => {
             handler(target.checked)
         })
     }
@@ -187,7 +188,7 @@ export default class View {
 	 * @param {Function} handler Function called on synthetic event.
 	 */
     bindRemoveItem(handler) {
-        $delegate(this.$todoList, '.destroy', 'click', ({target}) => {
+        $delegate(this.$todoList, '.destroy', 'click', ({ target }) => {
             handler(_itemId(target))
         })
     }
@@ -196,7 +197,7 @@ export default class View {
 	 * @param {Function} handler Function called on synthetic event.
 	 */
     bindToggleItem(handler) {
-        $delegate(this.$todoList, '.toggle', 'click', ({target}) => {
+        $delegate(this.$todoList, '.toggle', 'click', ({ target }) => {
             handler(_itemId(target), target.checked)
         })
     }
@@ -205,14 +206,14 @@ export default class View {
 	 * @param {Function} handler Function called on synthetic event.
 	 */
     bindEditItemSave(handler) {
-        $delegate(this.$todoList, 'li .edit', 'blur', ({target}) => {
+        $delegate(this.$todoList, 'li .edit', 'blur', ({ target }) => {
             if (!target.dataset.iscanceled) {
                 handler(_itemId(target), target.value.trim())
             }
         }, true)
 
-		// Remove the cursor from the input when you hit enter just like if it were a real form
-        $delegate(this.$todoList, 'li .edit', 'keypress', ({target, keyCode}) => {
+        // Remove the cursor from the input when you hit enter just like if it were a real form
+        $delegate(this.$todoList, 'li .edit', 'keypress', ({ target, keyCode }) => {
             if (keyCode === ENTER_KEY) {
                 target.blur()
             }
@@ -223,7 +224,7 @@ export default class View {
 	 * @param {Function} handler Function called on synthetic event.
 	 */
     bindEditItemCancel(handler) {
-        $delegate(this.$todoList, 'li .edit', 'keyup', ({target, keyCode}) => {
+        $delegate(this.$todoList, 'li .edit', 'keyup', ({ target, keyCode }) => {
             if (keyCode === ESCAPE_KEY) {
                 target.dataset.iscanceled = true
                 target.blur()
