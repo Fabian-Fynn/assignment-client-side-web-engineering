@@ -8,9 +8,9 @@ const remoteDB = new PouchDB('https://couchdb.5k20.com/mmt-ss2017', {
     }
 })
 
-localDB.sync(remoteDB, {
-    live: true,
-})
+// localDB.sync(remoteDB, {
+//     // live: true,
+// })
 
 export default class Store {
     /**
@@ -74,21 +74,23 @@ export default class Store {
 	 * })
      */
     find(query, callback) {
+        console.log('query :', query);
+
         this.getStore()
             .then((todos) => {
-                let k;
+                console.log('todos :', todos);
 
-                const result = todos.filter(todo => {
-                    for (k in query) {
+                let result = ''
+
+                result = todos.filter((todo) => {
+                    for (let k in query) {
                         if (query[k] !== todo[k]) {
-                            return false;
+                            return false
                         }
                     }
-                    return true;
+                    return true
                 })
-                console.log('result :', result);
-
-                callback(result);
+                callback(result)
             })
     }
 
@@ -99,15 +101,18 @@ export default class Store {
      * @param {function()} [callback] Called when partialRecord is applied
      */
     update(update, callback) {
-        this.getStore().then((todos) => {
-            todos.put({
-                _id: update._id.toString(),
-                _rev: update._rev,
-                title: update.title,
-                completed: update.completed,
-            })
+        this.getStore().then(() => {
+            localDB.get(update.id.toString())
+                .then((doc) => {
+                    return localDB.put({
+                        _id: update.id.toString(),
+                        _rev: doc._rev,
+                        title: update.title,
+                        completed: update.completed,
+                    })
+                })
+                .then(callback())
         })
-
     }
 
     /**
@@ -130,7 +135,16 @@ export default class Store {
      * @param {function(ItemList)|function()} [callback] Called when records matching query are removed
      */
     remove(query, callback) {
+        const removeByQuery = (ts) => {
+            localDB.bulkDocs(ts.map((todo) => ({
+                _id: todo._id,
+                _rev: todo._rev,
+                _deleted: true,
+            })))
+                .then(callback)
 
+        }
+        this.find(query, removeByQuery)
     }
 
     /**
@@ -139,6 +153,14 @@ export default class Store {
      * @param {function(number, number, number)} callback Called when the count is completed
      */
     count(callback) {
-
+        this.getStore().then(todos => {
+            let compl = 0;
+            todos.forEach((todo) => {
+                if (todo.completed) {
+                    compl += 1
+                }
+            })
+            callback(todos.length, todos.length - compl, compl)
+        })
     }
 }
